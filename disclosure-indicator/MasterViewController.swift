@@ -12,7 +12,11 @@ class MasterViewController: UITableViewController {
 
     var detailViewController: DetailViewController? = nil
     var objects = [AnyObject]()
-
+    
+    /// Will return false if no split view or if split view is collapsed like on iPhone
+    var isInSplitViewPresentation: Bool {
+        return !(splitViewController?.isCollapsed ?? true)
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -73,7 +77,7 @@ class MasterViewController: UITableViewController {
         let object = objects[indexPath.row] as! NSDate
         cell.textLabel!.text = object.description
         
-        cell.accessoryType = .disclosureIndicator        
+        cell.accessoryType = !isInSplitViewPresentation ? .disclosureIndicator : .none
         return cell
     }
 
