@@ -17,6 +17,22 @@ class MasterViewController: UITableViewController {
     var isInSplitViewPresentation: Bool {
         return !(splitViewController?.isCollapsed ?? true)
     }
+    
+    /// Will be called each time the size of the view controller changes
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        
+        // We use the coordinator to keep track of the transition
+        coordinator.animate(alongsideTransition: nil, completion: { _ in
+            // In the completion of the transition,
+            // We loop on each cell
+            self.tableView.visibleCells.forEach {
+                // And we refresh the disclosure indicator of those cells
+                $0.setDisclosureIndicator(visible: !self.isInSplitViewPresentation)
+            }
+        })
+        
+        super.viewWillTransition(to: size, with: coordinator)
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -77,7 +93,7 @@ class MasterViewController: UITableViewController {
         let object = objects[indexPath.row] as! NSDate
         cell.textLabel!.text = object.description
         
-        cell.accessoryType = !isInSplitViewPresentation ? .disclosureIndicator : .none
+        cell.setDisclosureIndicator(visible: !isInSplitViewPresentation)
         return cell
     }
 
@@ -94,7 +110,10 @@ class MasterViewController: UITableViewController {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
         }
     }
-
-
 }
 
+extension UITableViewCell {
+    func setDisclosureIndicator(visible: Bool) {
+        accessoryType = visible ? .disclosureIndicator : .none
+    }
+}
