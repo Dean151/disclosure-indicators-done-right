@@ -26,8 +26,10 @@ class MasterViewController: UITableViewController {
             // In the completion of the transition,
             // We loop on each cell
             self.tableView.visibleCells.forEach {
-                // And we refresh the disclosure indicator of those cells
-                $0.setDisclosureIndicator(visible: !self.isInSplitViewPresentation)
+                if let cell = $0 as? DisclosableCell {
+                    // And we refresh the disclosure indicator of those cells
+                    cell.setDisclosureIndicator(visible: !self.isInSplitViewPresentation)
+                }
             }
         })
         
@@ -93,7 +95,9 @@ class MasterViewController: UITableViewController {
         let object = objects[indexPath.row] as! NSDate
         cell.textLabel!.text = object.description
         
-        cell.setDisclosureIndicator(visible: !isInSplitViewPresentation)
+        if let cell = cell as? DisclosableCell {
+            cell.setDisclosureIndicator(visible: !isInSplitViewPresentation)
+        }
         return cell
     }
 
@@ -112,8 +116,21 @@ class MasterViewController: UITableViewController {
     }
 }
 
-extension UITableViewCell {
+class MyCell: UITableViewCell, DisclosableCell {
+    var canDisclose: Bool {
+        // All of our cells can disclose
+        return true
+    }
+}
+
+/// Represent a cell that is disclosable
+protocol DisclosableCell {
+    var canDisclose: Bool { get }
+    func setDisclosureIndicator(visible: Bool)
+}
+
+extension DisclosableCell where Self: UITableViewCell {
     func setDisclosureIndicator(visible: Bool) {
-        accessoryType = visible ? .disclosureIndicator : .none
+        accessoryType = canDisclose && visible ? .disclosureIndicator : .none
     }
 }
